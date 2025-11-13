@@ -24,7 +24,6 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-// Custom command to log pass/fail with icons
 
 Cypress.Commands.add(
   "logPassFail",

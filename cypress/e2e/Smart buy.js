@@ -231,5 +231,9 @@ describe("Try Aliexpress / SmartBuy Full Flow", () => {
     //assert using cy.location
     cy.location("hostname").should("include", "smartbuy-me.com");
     cy.log("✅ Hostname contains 'smartbuy-me.com'");
+
+    
+
+    
   });
 });
