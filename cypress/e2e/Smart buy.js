@@ -106,7 +106,7 @@ const lastNames = [
   "Roberts",
 ];
 
-describe("Try Aliexpress / SmartBuy Full Flow", () => {
+describe("SmartBuy Full Flow Test", () => {
   //   it("Runs the full registration flow with a random first name", () => {
 
   //     /* -------------------------------------- Start of create new user process Code -------------------------------------------- */
@@ -568,6 +568,8 @@ describe("Try Aliexpress / SmartBuy Full Flow", () => {
   });
 });
 
-// ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
+/* ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
 
-/* --------------------------------------------End of Lecture 16 Assignment------------------------------------------------*/
+ --------------------------------------------End of Lecture 16 Assignment------------------------------------------------
+
+// *************(((Lecture 17 will be found @ "Alerts.js" Because we are handling a diffirent type of website)))****************/
