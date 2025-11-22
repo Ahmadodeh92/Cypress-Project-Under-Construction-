@@ -10,6 +10,24 @@ Cypress.on("uncaught:exception", (err, runnable) => {
   return false;
 });
 
+beforeEach(() => {
+  cy.clearCookies();
+  cy.clearAllLocalStorage();
+  cy.clearAllSessionStorage();
+
+  // Clear IndexedDB
+  indexedDB.databases().then((dbs) => {
+    dbs.forEach((db) => indexedDB.deleteDatabase(db.name));
+  });
+
+  // Clear Service Workers
+  if (navigator && navigator.serviceWorker) {
+    navigator.serviceWorker.getRegistrations().then((regs) => {
+      regs.forEach((reg) => reg.unregister());
+    });
+  }
+});
+
 //---------------------------------------------this is for alert with ok button only----------------------------------------------
 
 describe("Testing Alerts With Ok", () => {

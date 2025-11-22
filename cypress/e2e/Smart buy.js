@@ -1,518 +1,576 @@
 /// <reference types="cypress" />
 
-const names = [
-  "Olivia",
-  "Liam",
-  "Emma",
-  "Noah",
-  "Ava",
-  "Oliver",
-  "Sophia",
-  "Elijah",
-  "Isabella",
-  "Lucas",
-  "Mia",
-  "Mason",
-  "Amelia",
-  "Logan",
-  "Harper",
-  "James",
-  "Evelyn",
-  "Ethan",
-  "Abigail",
-  "Alexander",
-  "Emily",
-  "Benjamin",
-  "Ella",
-  "Jacob",
-  "Avery",
-  "Michael",
-  "Scarlett",
-  "Daniel",
-  "Grace",
-  "Henry",
-  "Chloe",
-  "Jackson",
-  "Victoria",
-  "Sebastian",
-  "Riley",
-  "Jack",
-  "Aria",
-  "Aiden",
-  "Lily",
-  "Owen",
-  "Zoey",
-  "Samuel",
-  "Penelope",
-  "Matthew",
-  "Lillian",
-  "Joseph",
-  "Nora",
-  "Levi",
-  "Hannah",
-  "Mateo",
-];
+beforeEach(() => {
+  cy.clearCookies();
+  cy.clearAllLocalStorage();
+  cy.clearAllSessionStorage();
 
-const lastNames = [
-  "Smith",
-  "Johnson",
-  "Williams",
-  "Brown",
-  "Jones",
-  "Garcia",
-  "Miller",
-  "Davis",
-  "Rodriguez",
-  "Martinez",
-  "Hernandez",
-  "Lopez",
-  "Gonzalez",
-  "Wilson",
-  "Anderson",
-  "Thomas",
-  "Taylor",
-  "Moore",
-  "Jackson",
-  "Martin",
-  "Lee",
-  "Perez",
-  "Thompson",
-  "White",
-  "Harris",
-  "Sanchez",
-  "Clark",
-  "Ramirez",
-  "Lewis",
-  "Robinson",
-  "Walker",
-  "Young",
-  "Allen",
-  "King",
-  "Wright",
-  "Scott",
-  "Torres",
-  "Nguyen",
-  "Hill",
-  "Flores",
-  "Green",
-  "Adams",
-  "Nelson",
-  "Baker",
-  "Hall",
-  "Rivera",
-  "Campbell",
-  "Mitchell",
-  "Carter",
-  "Roberts",
-];
+  // Clear IndexedDB
+  indexedDB.databases().then((dbs) => {
+    dbs.forEach((db) => indexedDB.deleteDatabase(db.name));
+  });
+
+  // Clear Service Workers
+  if (navigator && navigator.serviceWorker) {
+    navigator.serviceWorker.getRegistrations().then((regs) => {
+      regs.forEach((reg) => reg.unregister());
+    });
+  }
+});
+
+///* -------------------------------------- Start of create new user process Code -------------------------------------------- */
+
+//**************/Used "Promise.then" to ensure proper logging order in Cypress after each sucessful procedure\******************
+
+/* This Code will : 
+
+1 - Create new user using random name.
+2 - Create password using same nae and numbers.
+3 - will add random email domain.
+4 - log in after creating account.
+5 - log out and re log in using same credintials.
+6 - Assert that account page "Link"" has been reached
+Note : this test will be updated further more to add certain items under certain budget */
 
 describe("SmartBuy Full Flow Test", () => {
-  //   it("Runs the full registration flow with a random first name", () => {
+  // Random email domain list
+  const emailDomain = [
+    "@yahoo.com",
+    "@gmail.com",
+    "@outlook.com",
+    "@icloud.com",
+  ];
 
-  //     /* -------------------------------------- Start of create new user process Code -------------------------------------------- */
+  // it("Runs the full registration flow with a random first name", () => {
+  //   const names = [
+  //     "Olivia",
+  //     "Liam",
+  //     "Emma",
+  //     "Noah",
+  //     "Ava",
+  //     "Oliver",
+  //     "Sophia",
+  //     "Elijah",
+  //     "Isabella",
+  //     "Lucas",
+  //     "Mia",
+  //     "Mason",
+  //     "Amelia",
+  //     "Logan",
+  //     "Harper",
+  //     "James",
+  //     "Evelyn",
+  //     "Ethan",
+  //     "Abigail",
+  //     "Alexander",
+  //     "Emily",
+  //     "Benjamin",
+  //     "Ella",
+  //     "Jacob",
+  //     "Avery",
+  //     "Michael",
+  //     "Scarlett",
+  //     "Daniel",
+  //     "Grace",
+  //     "Henry",
+  //     "Chloe",
+  //     "Jackson",
+  //     "Victoria",
+  //     "Sebastian",
+  //     "Riley",
+  //     "Jack",
+  //     "Aria",
+  //     "Aiden",
+  //     "Lily",
+  //     "Owen",
+  //     "Zoey",
+  //     "Samuel",
+  //     "Penelope",
+  //     "Matthew",
+  //     "Lillian",
+  //     "Joseph",
+  //     "Nora",
+  //     "Levi",
+  //     "Hannah",
+  //     "Mateo",
+  //   ];
 
-  //**************/Used "Promise.then" to ensure proper logging order in Cypress after each sucessful procedure\*******************
+  //   const lastNames = [
+  //     "Smith",
+  //     "Johnson",
+  //     "Williams",
+  //     "Brown",
+  //     "Jones",
+  //     "Garcia",
+  //     "Miller",
+  //     "Davis",
+  //     "Rodriguez",
+  //     "Martinez",
+  //     "Hernandez",
+  //     "Lopez",
+  //     "Gonzalez",
+  //     "Wilson",
+  //     "Anderson",
+  //     "Thomas",
+  //     "Taylor",
+  //     "Moore",
+  //     "Jackson",
+  //     "Martin",
+  //     "Lee",
+  //     "Perez",
+  //     "Thompson",
+  //     "White",
+  //     "Harris",
+  //     "Sanchez",
+  //     "Clark",
+  //     "Ramirez",
+  //     "Lewis",
+  //     "Robinson",
+  //     "Walker",
+  //     "Young",
+  //     "Allen",
+  //     "King",
+  //     "Wright",
+  //     "Scott",
+  //     "Torres",
+  //     "Nguyen",
+  //     "Hill",
+  //     "Flores",
+  //     "Green",
+  //     "Adams",
+  //     "Nelson",
+  //     "Baker",
+  //     "Hall",
+  //     "Rivera",
+  //     "Campbell",
+  //     "Mitchell",
+  //     "Carter",
+  //     "Roberts",
+  //   ];
 
-  //     // 1️⃣ Visit homepage
-  //     cy.visit("https://smartbuy-me.com/");
-  //     cy.get('span.locale-selector__value[plerdy-tracking-id="81336156002"]')
-  //       .should("have.text", "English");
-  //     cy.log("✅ English Language is visible");
-
-  //     // 2️⃣ Navigate to login page
-  //     cy.get("a[aria-label='My account'] span.icon-state__primary")
-  //       .click()
-  //       .then(() => console.log("Clicked on My Account icon"));
-
-  //     cy.get("form#customer_login h1.form__title.heading.h1")
-  //       .should("have.text", "Login to my account");
-  //     cy.log("✅ Login Page is visible");
-
-  //     // 3️⃣ Navigate to create account page
-  //     cy.get(".link.link--accented[href='/account/register']")
-  //       .click()
-  //       .then(() => console.log("Clicked on Create Account link"));
-
-  //     cy.get(".form__title.heading.h1")
-  //       .should("have.text", "Create my account");
-  //     cy.log("✅ Create Account Page is visible");
-
-  //     // 4️⃣ Generate random first name
-  //     const randomIndex = Math.floor(Math.random() * names.length);
-  //     const randomName = names[randomIndex];
-
-  //     cy.get("#customer\\[first_name\\]")
-  //       .type(randomName)
-  //       .then(() => console.log(`Typed random first name: ${randomName}`));
-  //     cy.log(`✅ Typed random first name: ${randomName}`);
-
-  //     // 5️⃣ Generate random last name
-  //     const randomLastIndex = Math.floor(Math.random() * lastNames.length);
-  //     const randomLastName = lastNames[randomLastIndex];
-
-  //     cy.get("#customer\\[last_name\\]")
-  //       .type(randomLastName)
-  //       .then(() => console.log(`Typed random last name: ${randomLastName}`));
-  //     cy.log(`✅ Typed random last name: ${randomLastName}`);
-
-  //     // 6️⃣ Generate random email
-  //     const randomEmail = `${randomName.toLowerCase()}.${randomLastName.toLowerCase()}@email.com`;
-
-  //     cy.get("#customer\\[email\\]")
-  //       .type(randomEmail)
-  //       .then(() => console.log(`Typed random email: ${randomEmail}`));
-
-  //     cy.log(`✅ Email: ${randomEmail}`);
-
-  //     // 7️⃣ Type password
-  //     const password = randomName + "12345";
-
-  //     cy.get("input[id='customer[password]']")
-  //       .type(password)
-  //       .then(() => console.log(`Typed password: ${password}`));
-
-  //     cy.log(`✅ Password: ${password}`);
-
-  //     // 8️⃣ Submit the registration form
-  //     cy.get(".form__submit.button.button--primary.button--full")
-  //       .click()
-  //       .then(() => console.log("Account creation form successfully submitted"));
-
-  //     cy.log(`✅ Account Created → Email: ${randomEmail}, Password: ${password}`);
-  //   });
-  // });
-
-  // ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
-
-  //     /* -------------------------------------- End of create new user process Code -------------------------------------------- */
-
-  //     /*  This Command was created to add new user to the website, sadly the website has no (Registration successful) message or
-  //     indication so it returns to the homepage only, please initiate this test only if you want to check if the
-  //     procedure will pass.
-
-  //     // Note : Verify successful registration by checking for account dashboard
-
-  //     // Sign in using created credentials for first time login validation (Can be found in "Cypress Logs + Console Log"
-  //     after test is finished.
-
-  // -------------------------------------------- ASSERTIONS TO BE ADDED HERE BELOW THIS LINE ---------------------------------------*/
-
-  // it("Assertions", () => {
+  //   // 1️⃣ Visit homepage
   //   cy.visit("https://smartbuy-me.com/");
-
-  //   // Assert that the language selector displays "English"
-
   //   cy.get(
   //     'span.locale-selector__value[plerdy-tracking-id="81336156002"]'
   //   ).should("have.text", "English");
   //   cy.log("✅ English Language is visible");
 
-  //   // Assert that page title is correct
+  //   // 2️⃣ Navigate to login page
+  //   cy.get("a[aria-label='My account'] span.icon-state__primary")
+  //     .click()
+  //     .then(() => console.log("Clicked on My Account icon"));
 
-  //   cy.title().should("eq", "SmartBuy");
+  //   cy.get("form#customer_login h1.form__title.heading.h1").should(
+  //     "have.text",
+  //     "Login to my account"
+  //   );
+  //   cy.log("✅ Login Page is visible");
 
-  //   // Assert that the main banner is visible
+  //   // 3️⃣ Navigate to create account page
+  //   cy.get(".link.link--accented[href='/account/register']")
+  //     .click()
+  //     .then(() => console.log("Clicked on Create Account link"));
 
-  //   cy.get("header[role='banner']").should("be.visible");
-  //   cy.log("✅ Main banner is visible");
+  //   cy.get(".form__title.heading.h1").should("have.text", "Create my account");
+  //   cy.log("✅ Create Account Page is visible");
 
-  //   // Assert that the footer contains Contact- Us
+  //   // 4️⃣ Generate random first name
+  //   const randomIndex = Math.floor(Math.random() * names.length);
+  //   const randomName = names[randomIndex];
 
-  //   cy.get(
-  //     "div[class='footer__block-item footer__block-item--link'] span:nth-child(1)"
-  //   ).should("have.text", "Contact US");
-  //   cy.log("✅ Footer contains 'Contact US' text");
+  //   cy.get("#customer\\[first_name\\]")
+  //     .type(randomName)
+  //     .then(() => console.log(`Typed random first name: ${randomName}`));
+  //   cy.log(`✅ Typed random first name: ${randomName}`);
 
-  //   // Assert that the search bar is present
-  //   cy.get("input[placeholder='Search...']").should("be.visible");
-  //   cy.log("✅ Search bar is visible");
+  //   // 5️⃣ Generate random last name
+  //   const randomLastIndex = Math.floor(Math.random() * lastNames.length);
+  //   const randomLastName = lastNames[randomLastIndex];
 
-  //   // Assert that the shopping cart icon is visible
+  //   cy.get("#customer\\[last_name\\]")
+  //     .type(randomLastName)
+  //     .then(() => console.log(`Typed random last name: ${randomLastName}`));
+  //   cy.log(`✅ Typed random last name: ${randomLastName}`);
 
-  //   cy.get(
-  //     "div[class='header__cart-icon icon-state'] span[class='icon-state__primary']"
-  //   ).should("be.visible");
-  //   cy.log("✅ Shopping cart icon is visible");
+  //   // 6️⃣ Generate random email (FIXED)
+  //   const emailDomain = [
+  //     "@yahoo.com",
+  //     "@gmail.com",
+  //     "@outlook.com",
+  //     "@icloud.com",
+  //   ];
+  //   const randomDomain =
+  //     emailDomain[Math.floor(Math.random() * emailDomain.length)];
 
-  //   // Assert that the promotional banner is visible
+  //   const randomEmail = `${randomName.toLowerCase()}.${randomLastName.toLowerCase()}${Math.floor(
+  //     Math.random() * 99
+  //   )}${randomDomain}`;
 
-  //   cy.get(
-  //     ".slideshow__image[src='//smartbuy-me.com/cdn/shop/files/WhatsApp_Image_2025-11-07_at_12.55.59_AM.jpg?v=1762515035&width=1600']"
-  //   ).should("be.visible");
-  //   cy.log("✅ Promotional banner is visible");
+  //   cy.get("#customer\\[email\\]")
+  //     .type(randomEmail)
+  //     .then(() => console.log(`${randomEmail}`));
 
-  //   // Assert that the featured products section is present
+  //   cy.log(`✅ Email: ${randomEmail}`);
 
-  //   cy.url().should("include", "smartbuy-me.com");
-  //   cy.log("✅ URL contains 'smartbuy-me.com'");
+  //   // 7️⃣ Type password
+  //   const password = randomName + "12345";
 
-  //   //assert using cy.location "Chain Commands"
-  //   cy.location("hostname").should("include", "smartbuy-me.com");
-  //   cy.log("✅ Hostname contains 'smartbuy-me.com'");
+  //   cy.get("input[id='customer[password]']")
+  //     .type(password)
+  //     .then(() => console.log(`Typed password: ${password}`));
 
-  //   //using .each + wrap to assert specific product visibility
+  //   cy.log(`✅ Password: ${password}`);
 
-  //   cy.get(".product-item__image-wrapper").each((element, index, list) => {
+  //   // 8️⃣ Submit the registration form
+  //   cy.get(".form__submit.button.button--primary.button--full")
+  //     .click()
+  //     .then(() => console.log("Account creation form successfully submitted"));
 
-  //     if (element.text().includes("Xiaomi Vacuum")) {
-  //       cy.wrap(element).click().then(() => {
-  //       console.log("Xiaomi Vacuum has been clicked.");
-  //       cy.log("✅ Xiaomi Vacuum product has been clicked.");
+  //   cy.log(`✅ Account Created → Email: ${randomEmail}, Password: ${password}`);
 
-  //     }
-  //     );
-  //   }
-  //   });
-
-  //   cy.log("Assertions test completed successfully.").then(() => {
-  //     console.log("Assertions test completed successfully.");
-  //   });
-
+  //   cy.get('[plerdy-tracking-id="31678870202"]').click();
+  //   cy.get('[plerdy-tracking-id="93465121001"]').click();
+  //   cy.get('[plerdy-tracking-id="31678870202"]').click();
+  //   cy.get('[id="customer[email]"]').type(randomEmail);
+  //   cy.get('[id="customer[password]"]').type(password);
+  //   cy.get('[plerdy-tracking-id="79851981401"]').click();
+  //   cy.log(
+  //     `🔓 Account login successful → Email: ${randomEmail}, Password: ${password}`);
+  //   cy.title('https://smartbuy-me.com/account').should("include", "Account")
+  //   cy.log('✅ Login using new user completed successfully')
   // });
+});
 
-  // ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
+// ******************************Code Tested and working fine in "Cypress 12.16.0" version" (20-11-2025)******************
 
-  //--------------------------------------------------------------------------------------------------------------------------
+//     /* -------------------------------------- End of create new user process Code -------------------------------------------- */
 
-  // it('Logs SmartBuy items below 100 JOD using .then()', () => {
+//     /*  This Command was created to add new user to the website, sadly the website has no (Registration successful) message or
+//     indication so it returns to the homepage only, please initiate this test only if you want to check if the
+//     procedure will pass.
 
-  //   cy.visit('https://smartbuy-me.com/');
+//     // Note : Verify successful registration by checking for account dashboard
 
-  //   // Navigate to featured products
-  //   cy.get(".section__action-link.link[href='/collections/featured-products']")
-  //     .click();
+//     // Sign in using created credentials for first time login validation (Can be found in "Cypress Logs + Console Log"
+//     after test is finished.
 
-  //   // Iterate through each product card
-  //   cy.get('.product-item__info').each(($el) => {
+// -------------------------------------------- ASSERTIONS TO BE ADDED HERE BELOW THIS LINE ---------------------------------------*/
 
-  //     cy.wrap($el).then((product) => {
+it("Assertions", () => {
+  cy.visit("https://smartbuy-me.com/");
 
-  //       const itemName = product
-  //         .find('.product-item__title.text--strong.link')
-  //         .text()
-  //         .trim();
+  // Assert that the language selector displays "English"
 
-  //       const priceText = product
-  //         .find('.price.price--highlight')
-  //         .text()
-  //         .trim();
+  cy.get(
+    'span.locale-selector__value[plerdy-tracking-id="81336156002"]'
+  ).should("have.text", "English");
+  cy.log("✅ English Language is visible");
 
-  //       if (!priceText) return; // skip items without price
+  // Assert that page title is correct
 
-  //       // Convert price → keep full decimal places (ex: 85.000)
-  //       const numericPrice = parseFloat(priceText.replace(/[^\d.]/g, ''));
+  cy.title().should("eq", "SmartBuy");
 
-  //       if (numericPrice < 100) {
+  // Assert that the main banner is visible
 
-  //         // Print clean format
-  //         const formattedPrice = numericPrice.toFixed(3);
+  cy.get("header[role='banner']").should("be.visible");
+  cy.log("✅ Main banner is visible");
 
-  //         cy.then(() => {
-  //           console.log(`(${itemName}, ${formattedPrice} JOD)`);
-  //         });
+  // Assert that the footer contains Contact- Us
 
-  //         cy.log(`(${itemName}, ${formattedPrice} JOD)`);
-  //       }
-  //     });
-  //   });
-  // });
+  cy.get(
+    "div[class='footer__block-item footer__block-item--link'] span:nth-child(1)"
+  ).should("have.text", "Contact US");
+  cy.log("✅ Footer contains 'Contact US' text");
 
-  // ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
+  // Assert that the search bar is present
+  cy.get("input[placeholder='Search...']").should("be.visible");
+  cy.log("✅ Search bar is visible");
 
-  //----------------------------------------------------------------------------------------------------------------------------
+  // Assert that the shopping cart icon is visible
 
-  // assert using invoke and alias.
+  cy.get(
+    "div[class='header__cart-icon icon-state'] span[class='icon-state__primary']"
+  ).should("be.visible");
+  cy.log("✅ Shopping cart icon is visible");
 
-  // it('Logs SmartBuy items below 100 JOD using .then()', () => {
+  // Assert that the promotional banner is visible
 
-  //   cy.visit('https://smartbuy-me.com/');
+  cy.get(
+    ".slideshow__image[src='//smartbuy-me.com/cdn/shop/files/WhatsApp_Image_2025-11-07_at_12.55.59_AM.jpg?v=1762515035&width=1600']"
+  ).should("be.visible");
+  cy.log("✅ Promotional banner is visible");
 
-  //   // Navigate to featured products
+  // Assert that the featured products section is present
 
-  //   cy.get(".section__action-link.link[href='/collections/featured-products']")
-  //     .click();
+  cy.url().should("include", "smartbuy-me.com");
+  cy.log("✅ URL contains 'smartbuy-me.com'");
 
-  //     cy.get('[class="collection"]').eq(0).invoke('text').as("firstitemtext")
+  //assert using cy.location "Chain Commands"
+  cy.location("hostname").should("include", "smartbuy-me.com");
+  cy.log("✅ Hostname contains 'smartbuy-me.com'");
 
-  //     cy.get('@firstitemtext').should('include', 'Xiaomi').then((text) => {
-  //       console.log('First item text includes Xiaomi: ' + text);
-  //       cy.log('First item text includes Xiaomi: ' + text);
+  //using .each + wrap to assert specific product visibility
 
-  // })
-  // });
+  cy.get(".product-item__image-wrapper").each((element, index, list) => {
 
-  // ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
+    if (element.text().includes("Xiaomi Vacuum")) {
+      cy.wrap(element).click().then(() => {
+      console.log("Xiaomi Vacuum has been clicked.");
+      cy.log("✅ Xiaomi Vacuum product has been clicked.");
 
-  //----------------------------------------------------------------------------------------------------------------------------
+    }
+    );
+  }
+  });
 
-  // it('Sort items with price and assign index to every item', () => {
-  // cy.visit('https://smartbuy-me.com/');
+  cy.log("Assertions test completed successfully.").then(() => {
+    console.log("Assertions test completed successfully.");
+  });
 
-  // // Navigate to featured products
+});
 
-  //   cy.get(".section__action-link.link[href='/collections/featured-products']")
-  //     .click();
+// ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
 
-  //     cy.get('[class="product-item product-item--vertical   1/3--tablet-and-up 1/4--desk"]').as("items")
+// --------------------------------------------------------------------------------------------------------------------------
 
-  //     cy.get('@items').find('[class="price price--highlight"]').each(($el,index,list) => {
-  //     cy.log("Item " + $el.text() + "Its index number is " + index);
+it('Logs SmartBuy items below 100 JOD using .then()', () => {
 
-  //     })
+  cy.visit('https://smartbuy-me.com/');
 
-  // })
+  // Navigate to featured products
+  cy.get(".section__action-link.link[href='/collections/featured-products']")
+    .click();
 
-  // ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
+  // Iterate through each product card
+  cy.get('.product-item__info').each(($el) => {
 
-  //----------------------------------------------------------------------------------------------------------------------------
+    cy.wrap($el).then((product) => {
 
-  // Combine all prices after discount and log the total price on certain page
+      const itemName = product
+        .find('.product-item__title.text--strong.link')
+        .text()
+        .trim();
 
-  // it('Combine all prices after discount and log the total price', () => {
+      const priceText = product
+        .find('.price.price--highlight')
+        .text()
+        .trim();
 
-  //   cy.visit('https://smartbuy-me.com/');
+      if (!priceText) return; // skip items without price
 
-  //   // Navigate to featured products
-  //   cy.get(".section__action-link.link[href='/collections/featured-products']")
-  //     .click();
+      // Convert price → keep full decimal places (ex: 85.000)
+      const numericPrice = parseFloat(priceText.replace(/[^\d.]/g, ''));
 
-  //   // Click to show "48 per page" and start math only after the click
-  //   cy.get('[data-action="select-value"][data-value="48"]').click({ force: true }).then(() => {
+      if (numericPrice < 100) {
 
-  //     // Wait for the product list container to exist
-  //     cy.get('.product-list.product-list--collection.product-list--with-sidebar', { timeout: 10000 })
-  //       .should('exist')
-  //       .then(($list) => {
+        // Print clean format
+        const formattedPrice = numericPrice.toFixed(3);
 
-  //         // Wait until the number of children stabilizes (all items loaded)
-  //         cy.wrap($list).find('.product-item__info', { timeout: 10000 })
-  //           .should('exist')
-  //           .then(($items) => {
+        cy.then(() => {
+          console.log(`(${itemName}, ${formattedPrice} JOD)`);
+        });
 
-  //             let total = 0;
+        cy.log(`(${itemName}, ${formattedPrice} JOD)`);
+      }
+    });
+  });
+});
 
-  //             $items.each((index, el) => {
-  //               let raw = Cypress.$(el).find('.price.price--highlight').text().trim();
-  //               let numeric = raw.replace(/[^\d.]/g, "");
-  //               if (numeric) {
-  //                 let value = parseFloat(numeric);
-  //                 total += value;
-  //                 cy.log(`Price ${index + 1}: ${value.toFixed(3)}`);
-  //               }
-  //             });
-
-  //             cy.then(() => {
-  //               cy.log(`Total Price = ${total.toFixed(3)} JOD`);
-  //               console.log(`Total Price = ${total.toFixed(3)} JOD`);
-  //             });
+// ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
 
-  //           });
-  //       });
-  //   });
-  // });
+// ----------------------------------------------------------------------------------------------------------------------------
 
-  // ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
+// assert using invoke and alias.
 
-  //***************************** */ Lecture 15 + Assignment Starts Here Below This Line (My Method)***************************
+it('Logs SmartBuy items below 100 JOD using .then()', () => {
 
-  //----------------------------------- Collect all Prices on the page and sum them up ----------------------------------------------------------
+  cy.visit('https://smartbuy-me.com/');
 
-  // it('Open SmartBuy, select 48 items per page, and sum prices', () => {
+  // Navigate to featured products
 
-  //   // 1️⃣ Visit the homepage
-  //   cy.visit('https://smartbuy-me.com/');
+  cy.get(".section__action-link.link[href='/collections/featured-products']")
+    .click();
 
-  //   // 2️⃣ Navigate to Featured Products
-  //   cy.get(".section__action-link.link[href='/collections/featured-products']")
-  //     .click();
+    cy.get('[class="collection"]').eq(0).invoke('text').as("firstitemtext")
 
-  //   // 3️⃣ Click "48 per page" in the value picker
-  //   cy.get('[data-action="select-value"][data-value="48"]').click({ force: true });
+    cy.get('@firstitemtext').should('include', 'Xiaomi').then((text) => {
+      console.log('First item text includes Xiaomi: ' + text);
+      cy.log('First item text includes Xiaomi: ' + text);
 
-  //   // 4️⃣ Assert the value-picker button updated
-  //   cy.get('.value-picker-button')
-  //     .should('contain.text', '48 per page');
+})
+});
 
-  //   // 5️⃣ Wait for product items to exist
-  //   cy.get('.product-list.product-list--collection.product-list--with-sidebar', { timeout: 10000 })
-  //     .find('.product-item__info')
-  //     .should('exist')
-  //     .then(($items) => {
+// ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
 
-  //       let total = 0;
+// ----------------------------------------------------------------------------------------------------------------------------
 
-  //       // 6️⃣ Loop through all items and sum prices
-  //       $items.each((index, el) => {
-  //         const raw = Cypress.$(el).find('.price.price--highlight').text().trim();
+it('Sort items with price and assign index to every item', () => {
+cy.visit('https://smartbuy-me.com/');
 
-  //         // Extract numeric value (e.g., "89.000 JOD" → "89.000")
-  //         const numeric = raw.replace(/[^\d.]/g, "");
+// Navigate to featured products
 
-  //         if (numeric) {
-  //           const value = parseFloat(numeric);
-  //           total += value;
+  cy.get(".section__action-link.link[href='/collections/featured-products']")
+    .click();
 
-  //           // Log each item price
-  //           cy.log(`Price ${index + 1}: ${value.toFixed(3)}`);
-  //         }
-  //       });
+    cy.get('[class="product-item product-item--vertical   1/3--tablet-and-up 1/4--desk"]').as("items")
 
-  //       // 7️⃣ Log total price
-  //       cy.then(() => {
-  //         cy.log(`Total Price = ${total.toFixed(3)} JOD`);
-  //         console.log(`Total Price = ${total.toFixed(3)} JOD`);
-  //       });
+    cy.get('@items').find('[class="price price--highlight"]').each(($el,index,list) => {
+    cy.log("Item " + $el.text() + "Its index number is " + index);
 
-  //     });
+    })
 
-  // });
+})
 
-  // ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
+// ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
 
-  // ***************************LECTURE 16 New info + Lecture 15 ASSIGNMENT STARTS HERE BELOW THIS LINE*************************
-  //------------------------- Use The extracted text to collect all Prices on the page and sum them up -------------------------
+// ----------------------------------------------------------------------------------------------------------------------------
 
-  // it("Sum the prices using another method", () => {
-  //   cy.visit("https://smartbuy-me.com/");
-  //   cy.get(
-  //     ".section__action-link.link[href='/collections/featured-products']"
-  //   ).click();
-  //   cy.get('[data-action="select-value"][data-value="48"]').click({ force: true });
-  //   cy.get('.value-picker-button').should('contain.text', '48 per page');
+// Combine all prices after discount and log the total price on certain page
 
-  //    cy.get('[class="product-item__info"]').as("productPrices"); // we select the whole product info section to narrow down the search for prices only within this section.
-  //    cy.get("@productPrices") // we give the alias to the selected section to use it below.
-  //     .find('[class="price price--highlight"]') // we find the price class within the selected section only.
-  //     .invoke("text") // we extract the text of all prices found within the section.
-  //     .as("itemPrice"); // we give an alias to the extracted text of all prices to use it below.
+it('Combine all prices after discount and log the total price', () => {
 
-  //    cy.get("@itemPrice").then((priceText) => {
-  //     // we get the alias of all prices text to manipulate it below
-  //     let total = 0; // initialize total variable to accumulate the sum of prices
+  cy.visit('https://smartbuy-me.com/');
 
-  //     priceText // the extracted text of all prices
-  //       .split(/JOD|Sale price/i) // split by "JOD" or "Sale price"
-  //       .map((s) => s.trim()) // remove whitespace
-  //       .filter((s) => s) // remove empty strings
-  //       .forEach((value) => {  // iterate through each price value
-  //         const numberOnly = Number(value.replace(/[^\d]/g, "")); // extract numbers only
-  //         if (!isNaN(numberOnly) && numberOnly > 0) {
-  //           // check if it's a valid number
-  //           cy.log(numberOnly); // log each number
-  //           total += numberOnly; // logs only numbers
+  // Navigate to featured products
+  cy.get(".section__action-link.link[href='/collections/featured-products']")
+    .click();
 
-  //           // You can accumulate the total here if needed
+  // Click to show "48 per page" and start math only after the click
+  cy.get('[data-action="select-value"][data-value="48"]').click({ force: true }).then(() => {
 
-  //         }
+    // Wait for the product list container to exist
+    cy.get('.product-list.product-list--collection.product-list--with-sidebar', { timeout: 10000 })
+      .should('exist')
+      .then(($list) => {
 
-  //         cy.log(total); // log the total after each addition
+        // Wait until the number of children stabilizes (all items loaded)
+        cy.wrap($list).find('.product-item__info', { timeout: 10000 })
+          .should('exist')
+          .then(($items) => {
 
-  //         });
-  //       });
-  //   });
-  // });
+            let total = 0;
 
-  /* Challenges :
+            $items.each((index, el) => {
+              let raw = Cypress.$(el).find('.price.price--highlight').text().trim();
+              let numeric = raw.replace(/[^\d.]/g, "");
+              if (numeric) {
+                let value = parseFloat(numeric);
+                total += value;
+                cy.log(`Price ${index + 1}: ${value.toFixed(3)}`);
+              }
+            });
+
+            cy.then(() => {
+              cy.log(`Total Price = ${total.toFixed(3)} JOD`);
+              console.log(`Total Price = ${total.toFixed(3)} JOD`);
+            });
+
+          });
+      });
+  });
+});
+
+// ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
+
+// ***************************** */ Lecture 15 + Assignment Starts Here Below This Line (My Method)***************************
+
+// ----------------------------------- Collect all Prices on the page and sum them up -------------------------------------------
+
+it('Open SmartBuy, select 48 items per page, and sum prices', () => {
+
+  // 1️⃣ Visit the homepage
+  cy.visit('https://smartbuy-me.com/');
+
+  // 2️⃣ Navigate to Featured Products
+  cy.get(".section__action-link.link[href='/collections/featured-products']")
+    .click();
+
+  // 3️⃣ Click "48 per page" in the value picker
+  cy.get('[data-action="select-value"][data-value="48"]').click({ force: true });
+
+  // 4️⃣ Assert the value-picker button updated
+  cy.get('.value-picker-button')
+    .should('contain.text', '48 per page');
+
+  // 5️⃣ Wait for product items to exist
+  cy.get('.product-list.product-list--collection.product-list--with-sidebar', { timeout: 10000 })
+    .find('.product-item__info')
+    .should('exist')
+    .then(($items) => {
+
+      let total = 0;
+
+      // 6️⃣ Loop through all items and sum prices
+      $items.each((index, el) => {
+        const raw = Cypress.$(el).find('.price.price--highlight').text().trim();
+
+        // Extract numeric value (e.g., "89.000 JOD" → "89.000")
+        const numeric = raw.replace(/[^\d.]/g, "");
+
+        if (numeric) {
+          const value = parseFloat(numeric);
+          total += value;
+
+          // Log each item price
+          cy.log(`Price ${index + 1}: ${value.toFixed(3)}`);
+        }
+      });
+
+      // 7️⃣ Log total price
+      cy.then(() => {
+        cy.log(`Total Price = ${total.toFixed(3)} JOD`);
+        console.log(`Total Price = ${total.toFixed(3)} JOD`);
+      });
+
+    });
+
+});
+
+// ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
+
+// ***************************LECTURE 16 New info + Lecture 15 ASSIGNMENT STARTS HERE BELOW THIS LINE*************************
+// ------------------------- Use The extracted text to collect all Prices on the page and sum them up -------------------------
+
+it("Sum the prices using another method", () => {
+  cy.visit("https://smartbuy-me.com/");
+  cy.get(
+    ".section__action-link.link[href='/collections/featured-products']"
+  ).click();
+  cy.get('[data-action="select-value"][data-value="48"]').click({ force: true });
+  cy.get('.value-picker-button').should('contain.text', '48 per page');
+
+   cy.get('[class="product-item__info"]').as("productPrices"); // we select the whole product info section to narrow down the search for prices only within this section.
+   cy.get("@productPrices") // we give the alias to the selected section to use it below.
+    .find('[class="price price--highlight"]') // we find the price class within the selected section only.
+    .invoke("text") // we extract the text of all prices found within the section.
+    .as("itemPrice"); // we give an alias to the extracted text of all prices to use it below.
+
+   cy.get("@itemPrice").then((priceText) => {
+    // we get the alias of all prices text to manipulate it below
+    let total = 0; // initialize total variable to accumulate the sum of prices
+
+    priceText // the extracted text of all prices
+      .split(/JOD|Sale price/i) // split by "JOD" or "Sale price"
+      .map((s) => s.trim()) // remove whitespace
+      .filter((s) => s) // remove empty strings
+      .forEach((value) => {  // iterate through each price value
+        const numberOnly = Number(value.replace(/[^\d]/g, "")); // extract numbers only
+        if (!isNaN(numberOnly) && numberOnly > 0) {
+          // check if it's a valid number
+          cy.log(numberOnly); // log each number
+          total += numberOnly; // logs only numbers
+
+          // You can accumulate the total here if needed
+
+        }
+
+        cy.log(total); // log the total after each addition
+
+        });
+      });
+  });
+
+/* Challenges :
   1 - the website i used was diffirent from the ones "Abd-Alraheem" used 
   2 - The method i used has'nt been used by "mentor" 
   3 - i managed to isolate the number from two text's on each side
@@ -523,7 +581,7 @@ describe("SmartBuy Full Flow Test", () => {
   // ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
   -------------------------------------End of lecture 16 + Lecture 15 Assignment-----------------------------------------------.*/
 
-  /*--------------------------------------------- Lecture 16 Assignment------------------------------------------------------- 
+/*--------------------------------------------- Lecture 16 Assignment------------------------------------------------------- 
   
   1 - Add 10 % discount on each price and print Price "Before" = "Price After Discount"
   2 - Print First 3 alphabets of each item name 
@@ -566,10 +624,9 @@ describe("SmartBuy Full Flow Test", () => {
       }
     });
   });
-});
 
-/* ******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
+//******************************Code Tested and working fine in "Cypress 12.16.0" version" (17-11-2025)******************
 
- --------------------------------------------End of Lecture 16 Assignment------------------------------------------------
+//--------------------------------------------End of Lecture 16 Assignment------------------------------------------------
 
-// *************(((Lecture 17 will be found @ "Alerts.js" Because we are handling a diffirent type of website)))****************/
+//*************(((Lecture 17 will be found @ "Alerts.js" Because we are handling a diffirent type of website)))**************
