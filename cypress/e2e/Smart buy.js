@@ -246,7 +246,7 @@ describe("SmartBuy Full Flow Test", () => {
 //     /* -------------------------------------- End of create new user process Code -------------------------------------------- */
 
 //     /*  This Command was created to add new user to the website, sadly the website has no (Registration successful) message or
-//     indication so it returns to the homepage only, please initiate this test only if you want to check if the
+//     indication so it opens a normal page thats all, please initiate this test only if you want to check if the
 //     procedure will pass.
 
 //     // Note : Verify successful registration by checking for account dashboard

@@ -46,7 +46,7 @@ describe("PhP Project", () => {
 
     // Use system's current date
     const today = new Date();
-    today.setDate(today.getDate() + 4); // add 3 days
+    today.setDate(today.getDate() + 3); // add 3 days
 
     // Format to DD-MM-YYYY
     const dd = String(today.getDate()).padStart(2, "0");

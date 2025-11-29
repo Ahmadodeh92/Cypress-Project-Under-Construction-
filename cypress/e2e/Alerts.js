@@ -208,27 +208,47 @@ describe("Using Calender", () => {
   });
 });
 
-// -------------------------------Different type of calender to calculate age by days ----------------------------------------
+/* -------------------------------Different type of calender to calculate age by days ----------------------------------------
+* - note that this calender will know the current day and assert the correct day each day and will not crash if date changes day 
+after day */
 
-describe("Using Calender", () => {
-  it("Set calender properties", () => {
+describe("Using Calendar", () => {
+  it("Calculates age correctly for today's date", () => {
+
     cy.visit("https://testautomationpractice.blogspot.com/#");
+
+    // 1️⃣ Set the birth date
+    const birthDate = "1992-04-06";
     cy.get("#start-date")
-      .invoke("val", "1992-04-06")
+      .invoke("val", birthDate)
       .trigger("input")
       .trigger("change");
 
+    // 2️⃣ Get today's date from browser's real clock
     const today = new Date().toISOString().split("T")[0];
 
-    cy.get("#end-date").invoke("val", today).trigger("input").trigger("change");
+    cy.get("#end-date")
+      .invoke("val", today)
+      .trigger("input")
+      .trigger("change");
+
     cy.get(".submit-btn").click();
-    cy.get('[class="result"]').should(
-      "have.text",
-      "You selected a range of 12281 days."
+
+    // 3️⃣ **Calculate expected days automatically**
+    const expectedDays = Math.floor(
+      (new Date(today) - new Date(birthDate)) / (1000 * 60 * 60 * 24)
     );
-    cy.log("Your age is", "12281", " ", "Days");
+
+    // 4️⃣ Assert dynamic result
+    cy.get(".result").should(
+      "have.text",
+      `You selected a range of ${expectedDays} days.`
+    );
+
+    cy.log("Age in days =", expectedDays);
   });
 });
+
 
 //----------------------------------------- Interacting with (DRAG & DROP Items)---------------------------------------------
 
